@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    section {
+        display: flex;
+    }
+
+    div {
+        width: 200px;
+        height: 250px;
+    }
+
+    /* 2d */
+    #div1 {
+        transform: translate(100px, 200px);
+        transform: rotate(30deg);
+        transform: scale(.2, .3);
+        transform: skew(30deg, 20deg);
+        /* matrix 方法有六个参数，包含旋转，缩放，移动（平移）和倾斜功能 */
+        transform: matrix(0.866, 0.5, -0.5, 0.866, 0, 0);
+    }
+
+    /* 3d */
+    #div2 {
+        transform: translate3d(100px, 100px, 100px);
+        /* rotate3d(x, y, z, a) xyz0-1 */
+        transform: rotate3d(.6, .4, .5, 60deg);
+        transform: scale3d(.2, .3, .4);
+        /* 从何处查看一个元素的角度 */
+        perspective: 500;
+    }
+
+    /* 过度 */
+    #div3 {
+        /* transition: width 2s */
+        transition-property: width;
+        transition-duration: 1s;
+        transition-timing-function: linear;
+        transition-delay: 2s;
+    }
+
+    #div3:hover {
+        width: 300px
+    }
+
+    /* 动画 */
+    @keyframes animate {
+        0% {
+            background: red
+        }
+
+        50% {
+            background: green;
+        }
+
+        70% {
+            background: yellow;
+        }
+
+        100% {
+            background: pink;
+        }
+    }
+
+    #div4 {
+        /* animation: animate 1s; */
+        animation-name: animate;
+        animation-duration: 5s;
+        /* 动画速度曲线 */
+        animation-timing-function: linear;
+        animation-delay: 2s;
+        /* 动画播放次数 */
+        animation-iteration-count: infinite;
+        /* 是否下周期逆向播放 */
+        animation-direction: alternate;
+        /* 动画是否正在运动或安亭 */
+        animation-play-state: running;
+    }
+
+    #section1 {
+        width: 350px;
+        height: 70px;
+        padding: 10px;
+        border: 1px solid #aaaaaa;
+    }
+
+    #section2 div {
+        width: 100px;
+        height: 100px;
+        /* padding: 1px; */
+    }
+
+    #section2 {
+        width: 500px;
+        height: 300px;
+        border: 1px solid red;
+        display: flex;
+        /* 主轴 内容 侧轴 */
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        /* 修改flex-wrap */
+        align-content: flex-start;
+    }
+</style>
+
+<body>
+    <!-- canvas -->
+    <canvas id="myh_canvas" style="border: 1px solid red;width: 100px;height: 100px;"></canvas>
+    <img src="scream.jpg" alt="" id="src">
+    <!-- transform transition animation -->
+    <section>
+        <div id="div1">div1</div>
+        <div id="div2">div2</div>
+        <div id="div3">div3</div>
+        <div id="div4">div4</div>
+    </section>
+
+    <!-- 拖放 -->
+    <section>
+        <p>拖放图片到矩形框</p>
+        <br>
+        <div id="section1" ondrop="drop(event)" ondragover="allowDrop(event)">
+        </div>
+        <br>
+        <img src="logo.png" draggable="true" id="drag1" ondragstart="drag(event)" width="336" height="69">
+
+        <!-- 地理定位 -->
+        <p id="demo">点击按钮获取定位</p>
+        <button onclick="getLocation(event)">点我</button>
+    </section>
+
+
+    <section id="section2">
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+        <div class="div"></div>
+    </section>
+    <!-- svg -->
+</body>
+<script>
+    var c = document.getElementById("myh_canvas")
+    var ctx = c.getContext('2d')
+    // 填充渐变
+    var grd = ctx.createLinearGradient(0, 0, 200, 0)
+    grd.addColorStop(0, 'red')
+    grd.addColorStop(1, 'white')
+    ctx.fillStyle = grd
+    // ctx.fillStyle = "red"
+    ctx.rotate(20 * Math.PI / 180)
+    ctx.fillRect(0, 0, 150, 90)
+
+    // 画线
+    ctx.moveTo(0, 0)
+    ctx.lineTo(200, 100)
+
+    // 画圆
+    // x,y圆心 r半径 sAngle起始角eAngle结束角 counterclockwise顺时针还是逆时针绘图
+    // ctx.arc(x, y, r, sAngle, eAngle, counterclockwise)
+    ctx.beginPath()
+    ctx.arc(90, 50, 40, 0, 2 * Math.PI)
+    ctx.stroke()
+    // 文本
+    ctx.font = "30px 黑体"
+    ctx.strokeText('Hello World', 10, 50)
+    ctx.fillText('Hello World', 100, 50)
+    //图像
+    var img = document.getElementById('src')
+    // drawImage(img,x,y) x,y坐标
+    ctx.drawImage(img, 10, 10)
+
+
+    function drag(e) {
+        e.dataTransfer.setData('Text', e.target.id)
+    }
+    function allowDrop(e) {
+        // 默认无法将数据/元素放到其他，此处阻止默认处理
+        e.preventDefault()
+    }
+    function drop(e) {
+        // 阻止浏览器默认行为
+        e.preventDefault();
+        const data = e.dataTransfer.getData('Text')
+        e.target.appendChild(document.getElementById(data))
+    }
+    const x = document.getElementById('demo')
+    function getLocation(e) {
+        navigator.geolocation.getCurrentPosition(data => {
+            console.log(data)
+            x.innerHTML = `维度：${data.coords.latitude} <br>经度：${data.coords.longitude}`
+        })
+    }
+    Array.from({ length: 15 }).map((key, val) => val).forEach(i => {
+        document.getElementsByClassName('div')[i].style.backgroundImage = `url('./gx/${i + 1}.png')`
+        document.getElementsByClassName('div')[i].style.backgroundSize = "100px 100px"
+    })
+</script>
+
+</html>
